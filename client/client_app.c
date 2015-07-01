@@ -77,13 +77,10 @@ int main(int argc, char **argv)
   int port = 7681;
   int use_ssl = 0;
   struct libwebsocket_context *context;
-  const char *address;
   struct libwebsocket *wsi_test;
-  int ietf_version = -1; /* latest */
   struct lws_context_creation_info info;
 
   memset(&info, 0, sizeof info);
-  address = "localhost";
 
   info.port = CONTEXT_PORT_NO_LISTEN;
   info.protocols = protocols;
@@ -96,8 +93,6 @@ int main(int argc, char **argv)
     fprintf(stderr, "Creating libwebsocket context failed\n");
     return 1;
   }
-
-  /* create a client websocket using dumb increment protocol */
 
   wsi_test = libwebsocket_client_connect(/* context */        context,
                                          /* address */        "localhost",

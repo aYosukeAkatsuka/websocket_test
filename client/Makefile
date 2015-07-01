@@ -13,7 +13,7 @@ LIBS=\
 	 ../libwebsockets/lib/libwebsockets.a
 
 CFLAGS=\
-	
+	-g
 
 LDFLAGS=\
 	-lz
