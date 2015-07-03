@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <string.h>
 #include <libwebsockets.h>
 
 static int was_closed;

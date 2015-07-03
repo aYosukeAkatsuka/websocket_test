@@ -4,7 +4,8 @@ VPATH=\
 	.
 
 INCLUDE=\
-	../libwebsockets/lib
+	-I../libwebsockets/lib \
+	-I../libwebsockets
 
 OBJS=\
 	 server_app.o
