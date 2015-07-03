@@ -1,2 +1,3 @@
 -I../libwebsockets/lib
+-I../libwebsockets
 
