@@ -6,6 +6,52 @@ static int was_closed;
 static int deny_deflate;
 static int deny_mux;
 
+struct reason_string {
+  enum libwebsocket_callback_reasons reason;
+  char *reason_string;
+};
+
+static struct reason_string reason_strings[] = {
+  {LWS_CALLBACK_ESTABLISHED, "LWS_CALLBACK_ESTABLISHED"},
+  {LWS_CALLBACK_CLIENT_CONNECTION_ERROR,"LWS_CALLBACK_CLIENT_CONNECTION_ERROR"},
+  {LWS_CALLBACK_CLIENT_FILTER_PRE_ESTABLISH,"LWS_CALLBACK_CLIENT_FILTER_PRE_ESTABLISH"},
+  {LWS_CALLBACK_CLIENT_ESTABLISHED,"LWS_CALLBACK_CLIENT_ESTABLISHED"},
+  {LWS_CALLBACK_CLOSED,"LWS_CALLBACK_CLOSED"},
+  {LWS_CALLBACK_CLOSED_HTTP,"LWS_CALLBACK_CLOSED_HTTP"},
+  {LWS_CALLBACK_RECEIVE,"LWS_CALLBACK_RECEIVE"},
+  {LWS_CALLBACK_CLIENT_RECEIVE,"LWS_CALLBACK_CLIENT_RECEIVE"},
+  {LWS_CALLBACK_CLIENT_RECEIVE_PONG,"LWS_CALLBACK_CLIENT_RECEIVE_PONG"},
+  {LWS_CALLBACK_CLIENT_WRITEABLE,"LWS_CALLBACK_CLIENT_WRITEABLE"},
+  {LWS_CALLBACK_SERVER_WRITEABLE,"LWS_CALLBACK_SERVER_WRITEABLE"},
+  {LWS_CALLBACK_HTTP,"LWS_CALLBACK_HTTP"},
+  {LWS_CALLBACK_HTTP_BODY,"LWS_CALLBACK_HTTP_BODY"},
+  {LWS_CALLBACK_HTTP_BODY_COMPLETION,"LWS_CALLBACK_HTTP_BODY_COMPLETION"},
+  {LWS_CALLBACK_HTTP_FILE_COMPLETION,"LWS_CALLBACK_HTTP_FILE_COMPLETION"},
+  {LWS_CALLBACK_HTTP_WRITEABLE,"LWS_CALLBACK_HTTP_WRITEABLE"},
+  {LWS_CALLBACK_FILTER_NETWORK_CONNECTION,"LWS_CALLBACK_FILTER_NETWORK_CONNECTION"},
+  {LWS_CALLBACK_FILTER_HTTP_CONNECTION,"LWS_CALLBACK_FILTER_HTTP_CONNECTION"},
+  {LWS_CALLBACK_SERVER_NEW_CLIENT_INSTANTIATED,"LWS_CALLBACK_SERVER_NEW_CLIENT_INSTANTIATED"},
+  {LWS_CALLBACK_FILTER_PROTOCOL_CONNECTION,"LWS_CALLBACK_FILTER_PROTOCOL_CONNECTION"},
+  {LWS_CALLBACK_OPENSSL_LOAD_EXTRA_CLIENT_VERIFY_CERTS,"LWS_CALLBACK_OPENSSL_LOAD_EXTRA_CLIENT_VERIFY_CERTS"},
+  {LWS_CALLBACK_OPENSSL_LOAD_EXTRA_SERVER_VERIFY_CERTS,"LWS_CALLBACK_OPENSSL_LOAD_EXTRA_SERVER_VERIFY_CERTS"},
+  {LWS_CALLBACK_OPENSSL_PERFORM_CLIENT_CERT_VERIFICATION,"LWS_CALLBACK_OPENSSL_PERFORM_CLIENT_CERT_VERIFICATION"},
+  {LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER,"LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER"},
+  {LWS_CALLBACK_CONFIRM_EXTENSION_OKAY,"LWS_CALLBACK_CONFIRM_EXTENSION_OKAY"},
+  {LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED,"LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED"},
+  {LWS_CALLBACK_PROTOCOL_INIT,"LWS_CALLBACK_PROTOCOL_INIT"},
+  {LWS_CALLBACK_PROTOCOL_DESTROY,"WS_CALLBACK_PROTOCOL_DESTROY"},
+  {LWS_CALLBACK_WSI_CREATE,"LWS_CALLBACK_WSI_CREATE"},
+  {LWS_CALLBACK_WSI_DESTROY,"LWS_CALLBACK_WSI_DESTROY"},
+  {LWS_CALLBACK_GET_THREAD_ID,"LWS_CALLBACK_GET_THREAD_ID"},
+  {LWS_CALLBACK_ADD_POLL_FD,"LWS_CALLBACK_ADD_POLL_FD"},
+  {LWS_CALLBACK_DEL_POLL_FD,"LWS_CALLBACK_DEL_POLL_FD"},
+  {LWS_CALLBACK_CHANGE_MODE_POLL_FD,"LWS_CALLBACK_CHANGE_MODE_POLL_FD"},
+  {LWS_CALLBACK_LOCK_POLL,"LWS_CALLBACK_LOCK_POLL"},
+  {LWS_CALLBACK_UNLOCK_POLL,"LWS_CALLBACK_UNLOCK_POLL"},
+  {LWS_CALLBACK_OPENSSL_CONTEXT_REQUIRES_PRIVATE_KEY,"LWS_CALLBACK_OPENSSL_CONTEXT_REQUIRES_PRIVATE_KEY"},
+  {LWS_CALLBACK_USER,"LWS_CALLBACK_USE"}
+};
+
 static int
 callback_test(struct libwebsocket_context *this,
               struct libwebsocket *wsi,
@@ -54,6 +100,7 @@ callback_test(struct libwebsocket_context *this,
       break;
 
     default:
+      fprintf (stderr, "default case. reason = %s\n", reason_strings[reason].reason_string);
       break;
   }
 
@@ -67,9 +114,9 @@ static struct libwebsocket_protocols protocols[] = {
     "test",
     callback_test,
     0,
-    20,
+    0,
   },
-  { NULL, NULL, 0, 0 } /* end */
+  { NULL, NULL, 0, 0 } /* terminator */
 };
 
 int main(int argc, char **argv)
@@ -98,7 +145,7 @@ int main(int argc, char **argv)
 
   wsi_test = libwebsocket_client_connect(/* context */        context,
                                          /* address */        "localhost",
-                                         /* port */           7861,
+                                         /* port */           port,
                                          /* ssl_connection */ 0,
                                          /* path */           "/",
                                          /* host */           "localhost",
@@ -111,16 +158,16 @@ int main(int argc, char **argv)
     return 1;
   }
 
-  fprintf(stderr, "Waiting for connect...\n");
+  //fprintf(stderr, "Waiting for connect...\n");
 
-  n = 0;
-  while (n >= 0 && !was_closed) {
-    n = libwebsocket_service(context, 10);
+  //n = 0;
+  //while (n >= 0 && !was_closed) {
+  //  n = libwebsocket_service(context, 10);
 
-    if (n < 0) {
-      continue;
-    }
-  }
+  //  if (n < 0) {
+  //    continue;
+  //  }
+  //}
 
   libwebsocket_context_destroy(context);
   return 0;
