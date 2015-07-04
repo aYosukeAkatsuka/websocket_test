@@ -3,6 +3,32 @@
 #include <string.h>
 #include <libwebsockets.h>
 
+static void
+dump_handshake_info(struct libwebsocket *wsi)
+{
+  int n = 0;
+  char buf[256];
+  const unsigned char *c;
+
+  do {
+    c = lws_token_to_string(n);
+    if (!c) {
+      n++;
+      continue;
+    }
+
+    if (!lws_hdr_total_length(wsi, n)) {
+      n++;
+      continue;
+    }
+
+    lws_hdr_copy(wsi, buf, sizeof buf, n);
+
+    fprintf(stderr, "    %s = %s\n", (char *)c, buf);
+    n++;
+  } while (c);
+}
+
 static int callback_http(struct libwebsocket_context *context,
                          struct libwebsocket *wsi,
                          enum libwebsocket_callback_reasons reason,
@@ -19,8 +45,12 @@ callback_test (struct libwebsocket_context *context,
                void *user, void *in, size_t len)
 {
   switch (reason) {
+    case LWS_CALLBACK_FILTER_PROTOCOL_CONNECTION:
+      printf("reason = FILTER_PROTOCOL_CONNECTION.\n");
+      dump_handshake_info (wsi);
+      break;
     case LWS_CALLBACK_ESTABLISHED: // just log message that someone is connecting
-      printf("connection established\n");
+      printf("connection ESTABLISHED\n");
       break;
     case LWS_CALLBACK_RECEIVE: {
       // the funny part
