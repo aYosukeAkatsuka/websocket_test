@@ -158,16 +158,16 @@ int main(int argc, char **argv)
     return 1;
   }
 
-  //fprintf(stderr, "Waiting for connect...\n");
+  fprintf(stderr, "Waiting for connect...\n");
 
-  //n = 0;
-  //while (n >= 0 && !was_closed) {
-  //  n = libwebsocket_service(context, 10);
+  n = 0;
+  while (n >= 0 && !was_closed) {
+    n = libwebsocket_service(context, 10);
 
-  //  if (n < 0) {
-  //    continue;
-  //  }
-  //}
+    if (n < 0) {
+      continue;
+    }
+  }
 
   libwebsocket_context_destroy(context);
   return 0;
